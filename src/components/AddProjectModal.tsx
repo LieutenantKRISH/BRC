@@ -26,6 +26,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     revenue: 0,
   });
   const [newMember, setNewMember] = useState("");
+  const [isCustomClient, setIsCustomClient] = useState(false);
   const { clients, addProject } = useApp();
   const { toast } = useToast();
 
@@ -40,7 +41,13 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.description || !formData.startDate || !formData.deadline || !formData.client) {
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.startDate ||
+      !formData.deadline ||
+      !formData.client
+    ) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -52,7 +59,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     const projectData = {
       ...formData,
       progress: 0,
-      status: "In Progress",
+      status: "In Progress" as const,
       tasks: defaultTasks.map((taskName, index) => ({
         id: (index + 1).toString(),
         name: taskName,
@@ -80,6 +87,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
       });
       onClose();
     } catch (error) {
+      console.error(error);
       toast({
         title: "Error",
         description: "Failed to create project. Please try again.",
@@ -104,6 +112,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
       assignedMembers: prev.assignedMembers.filter((m) => m !== member),
     }));
   };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addMember();
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
