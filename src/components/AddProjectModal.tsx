@@ -26,7 +26,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     revenue: 0,
   });
   const [newMember, setNewMember] = useState("");
-  const [isCustomClient, setIsCustomClient] = useState(false);
+  const [isCustomClient, setIsCustomClient] = useState(false); // Added missing state
   const { clients, addProject } = useApp();
   const { toast } = useToast();
 
@@ -37,6 +37,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     "Testing",
     "Deployment",
   ];
+
+  // Added missing function
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addMember();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +67,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     const projectData = {
       ...formData,
       progress: 0,
-      status: "In Progress" as const,
+      status: "In Progress" as "In Progress",
       tasks: defaultTasks.map((taskName, index) => ({
         id: (index + 1).toString(),
         name: taskName,
@@ -70,12 +78,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
     };
 
     try {
+      console.log("Submitting project data:", projectData); // Debug log
       await addProject(projectData);
       toast({
         title: "Success",
         description: "Project created successfully!",
       });
 
+      // Reset form
       setFormData({
         name: "",
         description: "",
@@ -85,9 +95,10 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
         assignedMembers: [],
         revenue: 0,
       });
+      setIsCustomClient(false); // Reset custom client state
       onClose();
     } catch (error) {
-      console.error(error);
+      console.error("Error creating project:", error); // Debug log
       toast({
         title: "Error",
         description: "Failed to create project. Please try again.",
@@ -111,13 +122,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose }) =>
       ...prev,
       assignedMembers: prev.assignedMembers.filter((m) => m !== member),
     }));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addMember();
-    }
   };
 
   return (
