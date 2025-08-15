@@ -63,7 +63,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
           </div>
           <div className="flex items-center space-x-1">
             <Users className="w-4 h-4" />
-            <span>{project.assignedMembers.length}</span>
+            <span>{project.assignedMembers}</span>
           </div>
         </div>
 

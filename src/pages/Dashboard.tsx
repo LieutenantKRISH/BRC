@@ -22,7 +22,6 @@ import {
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   
-  // ✅ Get everything from the useApp hook (no direct AppContext import)
   const { user, projects, tasks, meetings, logout } = useApp();
 
   const [showAddProject, setShowAddProject] = useState(false);
@@ -31,16 +30,22 @@ const Dashboard: React.FC = () => {
 
   const totalProjects = projects.length;
   const completedProjects = projects.filter(p => p.status === 'Completed').length;
-  const totalRevenue = projects.reduce((sum, project) => sum + project.revenue, 0);
+  const totalRevenue = projects.reduce((sum, project) => sum + (project.revenue || 0), 0);
+  
   const upcomingMeetings = meetings
     .filter(meeting => new Date(meeting.date) >= new Date())
     .slice(0, 3);
 
-  const totalTasks = projects.reduce((sum, project) => sum + project.tasks.length, 0);
-  const completedTasks = projects.reduce(
-    (sum, project) => sum + project.tasks.filter(task => task.completed).length, 
-    0
-  );
+  // ✅ Fixed task calculations with proper array checks
+  const totalTasks = projects.reduce((sum, project) => {
+    const tasks = Array.isArray(project.tasks) ? project.tasks : [];
+    return sum + tasks.length;
+  }, 0);
+
+  const completedTasks = projects.reduce((sum, project) => {
+    const tasks = Array.isArray(project.tasks) ? project.tasks : [];
+    return sum + tasks.filter(task => task.completed).length;
+  }, 0);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
